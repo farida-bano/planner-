@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Farida Board – Social Media Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#e8edf0;--surface:#fff;--ink:#12202b;--muted:#5d6b76;--line:#d3dbe1;--accent:#2f4bff;--accent-ink:#fff;
+  --ig:#d6336c;--yt:#e03131;--tt:#0a9d9d;--ok:#2b8a3e;--warn:#e67700;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1820;--surface:#18242e;--ink:#e8eef2;--muted:#93a3af;--line:#2b3a46;--accent:#7b8cff;--accent-ink:#0f1820;
+  --ig:#f06595;--yt:#ff6b6b;--tt:#3bc9c9;--ok:#69db7c;--warn:#ffa94d}}
+:root[data-theme="dark"]{
+  --bg:#0f1820;--surface:#18242e;--ink:#e8eef2;--muted:#93a3af;--line:#2b3a46;--accent:#7b8cff;--accent-ink:#0f1820;
+  --ig:#f06595;--yt:#ff6b6b;--tt:#3bc9c9;--ok:#69db7c;--warn:#ffa94d}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;line-height:1.45}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 14px 60px}
+header{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px;margin-bottom:18px}
+h1{margin:0;font-size:clamp(1.9rem,5vw,3rem);font-weight:800;letter-spacing:-.03em;line-height:1}
+.sub{margin:6px 0 0;color:var(--muted)}
+.stats{display:flex;gap:8px;flex-wrap:wrap}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 14px;min-width:84px}
+.stat b{display:block;font-size:1.4rem;line-height:1.1}
+.stat span{font-size:.8rem;color:var(--muted)}
+.layout{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start}
+@media (max-width:860px){.layout{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
+.composer{position:sticky;top:12px}
+@media (max-width:860px){.composer{position:static}}
+.composer h2,.boardhead h2{margin:0 0 4px;font-size:1.15rem}
+label{display:block;margin-top:12px;font-weight:600;font-size:.9rem}
+input,select,textarea,button{font:inherit;color:inherit}
+input,select,textarea{width:100%;margin-top:5px;padding:10px 11px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+textarea{min-height:96px;resize:vertical}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.platforms{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+.platforms button{flex:1;padding:9px 4px;border:2px solid var(--line);border-radius:8px;background:transparent;cursor:pointer;font-weight:600}
+.platforms button[aria-pressed="true"]{color:#fff;border-color:transparent}
+.platforms button[data-p="Instagram"][aria-pressed="true"]{background:var(--ig)}
+.platforms button[data-p="YouTube"][aria-pressed="true"]{background:var(--yt)}
+.platforms button[data-p="TikTok"][aria-pressed="true"]{background:var(--tt)}
+.platforms button[data-p="Facebook"][aria-pressed="true"]{background:#1877f2}
+.counter{display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted);margin-top:4px}
+.counter.over{color:var(--yt);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.chip{font-size:.78rem;padding:2px 8px;border-radius:99px;background:var(--bg);border:1px solid var(--line);color:var(--accent)}
+.quick{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.quick button{padding:5px 10px;font-size:.8rem;border:1px solid var(--line);background:transparent;border-radius:99px;cursor:pointer}
+.quick button:hover,.platforms button:hover{border-color:var(--accent)}
+.primary{width:100%;margin-top:16px;padding:12px;border:0;border-radius:10px;background:var(--accent);color:var(--accent-ink);font-weight:800;cursor:pointer}
+.primary:hover{filter:brightness(1.1)}
+.ghost{background:transparent;border:1px solid var(--line);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:.82rem}
+.ghost:hover{border-color:var(--accent)}
+.err{color:var(--yt);font-size:.82rem;min-height:1.1em;margin:8px 0 0}
+.boardhead{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;margin-bottom:12px}
+.controls{display:flex;gap:6px;flex-wrap:wrap}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:transparent;padding:6px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.filters button{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:4px 12px;cursor:pointer;font-size:.85rem}
+.filters button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.week{display:grid;grid-template-columns:repeat(7,minmax(170px,1fr));gap:10px;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x proximity}
+.day{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px;min-height:150px;scroll-snap-align:start}
+.day.today{border:2px solid var(--accent)}
+.dayhead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.dayhead b{font-size:1rem}
+.dayhead span{font-size:.78rem;color:var(--muted)}
+.none{color:var(--muted);font-size:.82rem;margin:6px 0}
+.card{border:1px solid var(--line);border-left:5px solid var(--c);border-radius:8px;padding:9px;margin-top:8px;background:var(--bg);overflow-wrap:anywhere}
+.card.posted{opacity:.6}
+.card.posted .t{text-decoration:line-through}
+.meta{display:flex;justify-content:space-between;gap:6px;font-size:.76rem;color:var(--muted)}
+.t{font-weight:600;margin:3px 0}
+.cap{font-size:.82rem;color:var(--muted);margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.count{font-size:.76rem;font-weight:600;color:var(--accent);margin-top:4px}
+.count.late{color:var(--warn)}
+.acts{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}
+.acts button{padding:3px 8px;font-size:.76rem}
+.st{border:0;border-radius:99px;padding:2px 9px;font-size:.74rem;font-weight:600;cursor:pointer;color:#fff}
+.st[data-s="Idea"]{background:#7a8791}.st[data-s="Ready"]{background:var(--warn)}.st[data-s="Posted"]{background:var(--ok)}
+.list .card{margin-top:10px}
+.empty{text-align:center;color:var(--muted);padding:30px 0}
+.backup{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:18px;padding:12px 14px;border:1px dashed var(--line);border-radius:12px}
+.backup p{margin:0;flex:1 1 220px;font-size:.84rem;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(30px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:99px;opacity:0;transition:.25s;pointer-events:none;z-index:20}
+.toast.show{opacity:1;transform:translateX(-50%)}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Farida Board</h1>
+      <p class="sub">Plan the week. See what’s next. Never miss a post.</p>
+    </div>
+    <div class="stats" aria-live="polite">
+      <div class="stat"><b id="sIdea">0</b><span>Ideas</span></div>
+      <div class="stat"><b id="sReady">0</b><span>Ready</span></div>
+      <div class="stat"><b id="sPosted">0</b><span>Posted</span></div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <section class="panel composer" aria-label="Post composer">
+      <h2 id="formTitle">New post</h2>
+      <form id="form" novalidate>
+        <label id="pl">Platform</label>
+        <div class="platforms" role="group" aria-labelledby="pl">
+          <button type="button" data-p="Instagram" aria-pressed="true">Instagram</button>
+          <button type="button" data-p="YouTube" aria-pressed="false">YouTube</button>
+          <button type="button" data-p="TikTok" aria-pressed="false">TikTok</button>
+          <button type="button" data-p="Facebook" aria-pressed="false">Facebook</button>
+        </div>
+
+        <label for="title">Idea</label>
+        <input id="title" maxlength="80" placeholder="e.g. 5 study tips for exams" autocomplete="off">
+
+        <label for="caption">Caption</label>
+        <textarea id="caption" placeholder="Write your caption…"></textarea>
+        <div class="counter" id="counter"><span>Characters</span><span id="cnum">0 / 2200</span></div>
+
+        <label for="tags">Hashtags</label>
+        <input id="tags" placeholder="study tips exams (spaces, # optional)" autocomplete="off">
+        <div class="chips" id="chips"></div>
+
+        <label for="when">Date and time</label>
+        <input id="when" type="datetime-local">
+        <div class="quick">
+          <button type="button" data-q="today">Today 7 pm</button>
+          <button type="button" data-q="tomorrow">Tomorrow 7 pm</button>
+          <button type="button" data-q="week">Next week</button>
+        </div>
+
+        <p class="err" id="err" role="alert"></p>
+        <button class="primary" type="submit" id="submitBtn">Add to board</button>
+        <button class="ghost" type="button" id="cancelEdit" hidden style="width:100%;margin-top:8px">Cancel editing</button>
+      </form>
+    </section>
+
+    <section aria-label="Planned posts">
+      <div class="boardhead">
+        <h2 id="rangeLabel">This week</h2>
+        <div class="controls">
+          <div class="seg" role="group" aria-label="View">
+            <button type="button" id="vBoard" aria-pressed="true">Week</button>
+            <button type="button" id="vList" aria-pressed="false">List</button>
+          </div>
+          <div id="weekNav" class="controls">
+            <button class="ghost" type="button" id="prev" aria-label="Previous week">‹</button>
+            <button class="ghost" type="button" id="todayBtn">Today</button>
+            <button class="ghost" type="button" id="next" aria-label="Next week">›</button>
+          </div>
+        </div>
+      </div>
+      <div class="filters" id="filters" role="group" aria-label="Filter by platform"></div>
+      <div id="view"></div>
+      <div class="backup">
+        <p>Keep your posts safe. Save a backup file now and then, and load it back if your browser data is cleared or you switch devices.</p>
+        <button class="ghost" type="button" id="exportBtn">Save backup</button>
+        <button class="ghost" type="button" id="importBtn">Load backup</button>
+        <input type="file" id="importFile" accept=".json,application/json" hidden>
+      </div>
+    </section>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+  var KEY="postBoardV2";
+  var LIMITS={Instagram:2200,YouTube:5000,TikTok:2200,Facebook:63206};
+  var COLORS={Instagram:"var(--ig)",YouTube:"var(--yt)",TikTok:"var(--tt)",Facebook:"#1877f2"};
+  var STATES=["Idea","Ready","Posted"];
+  var $=function(id){return document.getElementById(id)};
+
+  var posts=load();
+  var platform="Instagram", filter="All", view="board", weekOffset=0, editId=null;
+
+  function load(){try{var r=localStorage.getItem(KEY);var a=r?JSON.parse(r):[];return Array.isArray(a)?a:[]}catch(e){return []}}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(posts))}catch(e){}}
+  function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+  function esc(s){var d=document.createElement("div");d.textContent=s;return d.textContent}
+  function toast(m){var t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(function(){t.classList.remove("show")},1800)}
+
+  function parseTags(s){
+    return s.split(/[\s,]+/).map(function(x){return x.replace(/^#+/,"").replace(/[^\w\u0600-\u06FF]/g,"")}).filter(Boolean)
+      .filter(function(x,i,a){return a.indexOf(x)===i}).map(function(x){return "#"+x});
+  }
+  function pad(n){return n<10?"0"+n:""+n}
+  function toLocalInput(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())+"T"+pad(d.getHours())+":"+pad(d.getMinutes())}
+  function startOfDay(d){var x=new Date(d);x.setHours(0,0,0,0);return x}
+  function weekStart(off){var d=startOfDay(new Date());d.setDate(d.getDate()-((d.getDay()+6)%7)+off*7);return d}
+  function sameDay(a,b){return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate()}
+
+  function countdown(ts,status){
+    if(status==="Posted")return {t:"Posted",late:false};
+    var diff=ts-Date.now(),abs=Math.abs(diff),m=Math.round(abs/60000),h=Math.floor(m/60),d=Math.floor(h/24);
+    var txt=d>0?d+"d "+(h%24)+"h":h>0?h+"h "+(m%60)+"m":m+" min";
+    return diff<0?{t:"Overdue by "+txt,late:true}:{t:"In "+txt,late:false};
+  }
+
+  /* composer */
+  function setPlatform(p){
+    platform=p;
+    document.querySelectorAll(".platforms button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.p===p)});
+    updateCounter();
+  }
+  function updateCounter(){
+    var n=$("caption").value.length,max=LIMITS[platform];
+    $("cnum").textContent=n+" / "+max;
+    $("counter").classList.toggle("over",n>max);
+  }
+  function updateChips(){
+    var box=$("chips");box.textContent="";
+    parseTags($("tags").value).forEach(function(t){var s=document.createElement("span");s.className="chip";s.textContent=t;box.appendChild(s)});
+  }
+  function quick(q){
+    var d=new Date();d.setSeconds(0,0);d.setHours(19,0);
+    if(q==="tomorrow")d.setDate(d.getDate()+1);
+    if(q==="week")d.setDate(d.getDate()+7);
+    $("when").value=toLocalInput(d);
+  }
+  function resetForm(){
+    $("form").reset();editId=null;$("err").textContent="";
+    $("formTitle").textContent="New post";$("submitBtn").textContent="Add to board";$("cancelEdit").hidden=true;
+    setPlatform("Instagram");updateChips();updateCounter();quick("today");
+  }
+  function submit(e){
+    e.preventDefault();
+    var title=$("title").value.trim(),caption=$("caption").value.trim(),when=$("when").value;
+    if(!title){$("err").textContent="Add a short idea so you can spot this post on the board.";$("title").focus();return}
+    if(!when){$("err").textContent="Pick a date and time.";$("when").focus();return}
+    if(caption.length>LIMITS[platform]){$("err").textContent=platform+" captions are limited to "+LIMITS[platform]+" characters.";return}
+    var data={platform:platform,title:title,caption:caption,tags:parseTags($("tags").value),ts:new Date(when).getTime()};
+    if(editId){
+      posts=posts.map(function(p){return p.id===editId?Object.assign({},p,data):p});toast("Post updated");
+    }else{
+      data.id=uid();data.status="Idea";posts.push(data);toast("Added to board");
+    }
+    save();resetForm();render();
+  }
+
+  /* cards */
+  function card(p){
+    var c=document.createElement("article");
+    c.className="card"+(p.status==="Posted"?" posted":"");c.style.setProperty("--c",COLORS[p.platform]);
+    var d=new Date(p.ts);
+
+    var meta=document.createElement("div");meta.className="meta";
+    var a=document.createElement("span");a.textContent=p.platform+" · "+d.toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});
+    var st=document.createElement("button");st.type="button";st.className="st";st.dataset.s=p.status;st.textContent=p.status;
+    st.title="Change status";
+    st.addEventListener("click",function(){
+      p.status=STATES[(STATES.indexOf(p.status)+1)%STATES.length];save();render();
+    });
+    meta.append(a,st);
+
+    var t=document.createElement("div");t.className="t";t.textContent=p.title;
+    c.append(meta,t);
+    if(p.caption){var cp=document.createElement("p");cp.className="cap";cp.textContent=p.caption;c.appendChild(cp)}
+    if(p.tags&&p.tags.length){
+      var ch=document.createElement("div");ch.className="chips";
+      p.tags.slice(0,6).forEach(function(x){var s=document.createElement("span");s.className="chip";s.textContent=x;ch.appendChild(s)});
+      c.appendChild(ch);
+    }
+    var cd=countdown(p.ts,p.status),cn=document.createElement("div");
+    cn.className="count"+(cd.late?" late":"");cn.textContent=cd.t;c.appendChild(cn);
+
+    var acts=document.createElement("div");acts.className="acts";
+    function btn(label,fn){var b=document.createElement("button");b.type="button";b.className="ghost";b.textContent=label;b.addEventListener("click",fn);acts.appendChild(b)}
+    btn("Copy",function(){
+      var text=p.caption+(p.tags.length?"\n\n"+p.tags.join(" "):"");
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(function(){toast("Caption copied")},function(){toast("Copy not allowed here")})}
+      else toast("Copy not available");
+    });
+    btn("Edit",function(){
+      editId=p.id;setPlatform(p.platform);$("title").value=p.title;$("caption").value=p.caption;
+      $("tags").value=p.tags.join(" ");$("when").value=toLocalInput(new Date(p.ts));
+      $("formTitle").textContent="Edit post";$("submitBtn").textContent="Save changes";$("cancelEdit").hidden=false;
+      updateChips();updateCounter();$("title").focus();window.scrollTo({top:0,behavior:"smooth"});
+    });
+    btn("Delete",function(){
+      var self=acts.lastChild;if(self.dataset.sure!=="1"){self.dataset.sure="1";self.textContent="Sure?";setTimeout(function(){self.dataset.sure="";self.textContent="Delete"},3000);return}
+      posts=posts.filter(function(x){return x.id!==p.id});save();render();toast("Deleted");
+    });
+    c.appendChild(acts);
+    return c;
+  }
+
+  /* render */
+  function visible(){
+    return posts.filter(function(p){return filter==="All"||p.platform===filter}).sort(function(a,b){return a.ts-b.ts});
+  }
+  function renderFilters(){
+    var box=$("filters");box.textContent="";
+    ["All","Instagram","YouTube","TikTok","Facebook"].forEach(function(f){
+      var n=f==="All"?posts.length:posts.filter(function(p){return p.platform===f}).length;
+      var b=document.createElement("button");b.type="button";b.textContent=f+" ("+n+")";b.setAttribute("aria-pressed",f===filter);
+      b.addEventListener("click",function(){filter=f;render()});box.appendChild(b);
+    });
+  }
+  function renderStats(){
+    ["Idea","Ready","Posted"].forEach(function(s){$("s"+s).textContent=posts.filter(function(p){return p.status===s}).length});
+  }
+  function renderBoard(list){
+    var ws=weekStart(weekOffset),we=new Date(ws);we.setDate(we.getDate()+6);
+    $("rangeLabel").textContent=ws.toLocaleDateString([], {day:"numeric",month:"short"})+" – "+we.toLocaleDateString([], {day:"numeric",month:"short"});
+    var wrap=document.createElement("div");wrap.className="week";
+    for(var i=0;i<7;i++){
+      var d=new Date(ws);d.setDate(ws.getDate()+i);
+      var col=document.createElement("div");col.className="day"+(sameDay(d,new Date())?" today":"");
+      var h=document.createElement("div");h.className="dayhead";
+      var b=document.createElement("b");b.textContent=d.toLocaleDateString([], {weekday:"short"});
+      var s=document.createElement("span");s.textContent=d.toLocaleDateString([], {day:"numeric",month:"short"});
+      h.append(b,s);col.appendChild(h);
+      var items=list.filter(function(p){return sameDay(new Date(p.ts),d)});
+      if(!items.length){var n=document.createElement("p");n.className="none";n.textContent="Free day";col.appendChild(n)}
+      items.forEach(function(p){col.appendChild(card(p))});
+      wrap.appendChild(col);
+    }
+    return wrap;
+  }
+  function renderList(list){
+    $("rangeLabel").textContent="All posts";
+    var wrap=document.createElement("div");wrap.className="list";
+    if(!list.length){var e=document.createElement("p");e.className="empty";e.textContent="Nothing planned yet. Fill in the form and add your first post.";wrap.appendChild(e)}
+    list.forEach(function(p){
+      var d=new Date(p.ts),h=document.createElement("div");h.className="meta";h.style.marginTop="12px";
+      h.textContent=d.toLocaleDateString([], {weekday:"long",day:"numeric",month:"long"});
+      wrap.append(h,card(p));
+    });
+    return wrap;
+  }
+  function render(){
+    renderStats();renderFilters();
+    $("weekNav").style.display=view==="board"?"flex":"none";
+    $("vBoard").setAttribute("aria-pressed",view==="board");$("vList").setAttribute("aria-pressed",view==="list");
+    var list=visible(),box=$("view");box.textContent="";
+    box.appendChild(view==="board"?renderBoard(list):renderList(list));
+  }
+
+  /* events */
+  document.querySelectorAll(".platforms button").forEach(function(b){b.addEventListener("click",function(){setPlatform(b.dataset.p)})});
+  document.querySelectorAll(".quick button").forEach(function(b){b.addEventListener("click",function(){quick(b.dataset.q)})});
+  $("caption").addEventListener("input",updateCounter);
+  $("tags").addEventListener("input",updateChips);
+  $("form").addEventListener("submit",submit);
+  $("cancelEdit").addEventListener("click",resetForm);
+  $("vBoard").addEventListener("click",function(){view="board";render()});
+  $("vList").addEventListener("click",function(){view="list";render()});
+  $("prev").addEventListener("click",function(){weekOffset--;render()});
+  $("next").addEventListener("click",function(){weekOffset++;render()});
+  $("todayBtn").addEventListener("click",function(){weekOffset=0;render()});
+
+  resetForm();render();
+  /* backup */
+  function backupName(){var d=new Date();return "farida-board-backup-"+d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())+".json"}
+  function exportBackup(){
+    if(!posts.length){toast("Add a post first, then save a backup");return}
+    var json=JSON.stringify({app:"farida-board",version:1,posts:posts},null,2),name=backupName();
+    function fallback(){
+      try{
+        var url=URL.createObjectURL(new Blob([json],{type:"application/json"}));
+        var a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
+        setTimeout(function(){URL.revokeObjectURL(url)},1000);toast("Backup saved");
+      }catch(e){toast("Could not save backup")}
+    }
+    if(window.claude&&window.claude.use){
+      window.claude.use("downloads").then(function(dl){
+        if(!dl){fallback();return}
+        dl.save({filename:name,data:json}).then(function(){toast("Backup saved")},function(err){
+          if(err&&err.code==="declined")return;toast("Could not save backup");
+        });
+      },fallback);
+    }else fallback();
+  }
+  function importBackup(file){
+    if(!file)return;
+    var r=new FileReader();
+    r.onload=function(){
+      try{
+        var data=JSON.parse(r.result),list=Array.isArray(data)?data:data.posts;
+        if(!Array.isArray(list))throw new Error("bad");
+        var added=0;
+        list.forEach(function(p){
+          if(!p||typeof p.title!=="string"||!LIMITS[p.platform]||!isFinite(p.ts))return;
+          var id=typeof p.id==="string"?p.id:uid();
+          if(posts.some(function(x){return x.id===id}))return;
+          posts.push({id:id,platform:p.platform,title:p.title.slice(0,80),caption:typeof p.caption==="string"?p.caption:"",
+            tags:Array.isArray(p.tags)?p.tags.filter(function(t){return typeof t==="string"}).slice(0,30):[],
+            ts:Number(p.ts),status:STATES.indexOf(p.status)>-1?p.status:"Idea"});
+          added++;
+        });
+        save();render();toast(added?added+" posts loaded":"No new posts found in this file");
+      }catch(e){toast("This file is not a valid backup")}
+      $("importFile").value="";
+    };
+    r.readAsText(file);
+  }
+  $("exportBtn").addEventListener("click",exportBackup);
+  $("importBtn").addEventListener("click",function(){$("importFile").click()});
+  $("importFile").addEventListener("change",function(){importBackup(this.files[0])});
+
+  setInterval(render,60000);
+})();
+</script>
+</body>
+</html>
